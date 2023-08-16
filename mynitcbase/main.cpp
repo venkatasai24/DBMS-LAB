@@ -91,6 +91,7 @@ void updateAttr(char relName[], char oldAttr[], char updAttr[]) {
 int main(int argc, char *argv[]) {
   Disk disk_run;
   char rel_name[16] = "Students", old_attr[16] = "Class", upd_attr[16] = "Batch";
+  updateAttr(rel_name, old_attr, upd_attr);
   schema();
   return 0;
 }
