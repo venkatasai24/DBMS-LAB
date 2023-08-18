@@ -7,7 +7,7 @@ struct BufferMetaInfo StaticBuffer::metainfo[BUFFER_CAPACITY];
 StaticBuffer::StaticBuffer() {
 
   // initialise all blocks as free
-  for (int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
+  for (int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY ; bufferIndex++) {
     metainfo[bufferIndex].free = true;
   }
 }
@@ -28,12 +28,10 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
   // iterate through all the blocks in the StaticBuffer
   // find the first free block in the buffer (check metainfo)
   // assign allocatedBuffer = index of the free block
-  for (int i = 0; i < BUFFER_CAPACITY; i++)
-  {
-    if (metainfo[i].free)
-    {
-        allocatedBuffer = i;
-        break;
+
+  for(allocatedBuffer = 0 ; allocatedBuffer < BUFFER_CAPACITY ; allocatedBuffer++ ) {
+    if(metainfo[allocatedBuffer].free==true) {
+      break;
     }
   }
 
@@ -49,16 +47,13 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
 int StaticBuffer::getBufferNum(int blockNum) {
   // Check if blockNum is valid (between zero and DISK_BLOCKS)
   // and return E_OUTOFBOUND if not valid.
-  if (blockNum >= DISK_BLOCKS || blockNum < 0)
-  {
+  if(blockNum<0 || blockNum>=DISK_BLOCKS) {
     return E_OUTOFBOUND;
   }
-  
+
   // find and return the bufferIndex which corresponds to blockNum (check metainfo)
-  for (int i = 0; i < BUFFER_CAPACITY; i++)
-  {
-    if(metainfo[i].blockNum == blockNum)
-    {
+  for(int i=0;i<BUFFER_CAPACITY;i++) {
+    if(metainfo[i].blockNum==blockNum) {
       return i;
     }
   }
