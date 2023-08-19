@@ -74,7 +74,6 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
   specification and the output can only be inserted into a new relation. We will
   be modifying it in the later stages to match the specification.
   ************************/
-
   printf("|");
   for (int i = 0; i < relCatEntry.numAttrs; ++i) {
     AttrCatEntry attrCatEntry;
@@ -95,6 +94,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
       recblock.getRecord(record, searchRes.slot);
 
       // print the attribute values in the same format as above
+      std::cout<<relCatEntry.numAttrs<<" ";
       for (int i = 0; i < relCatEntry.numAttrs; i++) {
         // get the attrCatEntry for the srcRelId with corresponding offsets
         AttrCatEntry attrCatEntry;
