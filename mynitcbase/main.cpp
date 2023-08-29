@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 
           printf("  %s: %s\n", attrName, attrType);
   */
-  for (int i = 0; i <= ATTRCAT_RELID; i++)
+  for (int i = 0; i <= ATTRCAT_RELID + 1 ; i++)
   {
     RelCatEntry relation;
     RelCacheTable::getRelCatEntry(i, &relation);
