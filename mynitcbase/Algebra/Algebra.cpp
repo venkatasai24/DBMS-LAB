@@ -135,7 +135,7 @@ int Algebra::insert(char relName[ATTR_SIZE], int nAttrs, char record[][ATTR_SIZE
 	// (check if the value returned from getRelId function call = E_RELNOTOPEN)
 	// get the relation catalog entry from relation cache
 	// (use RelCacheTable::getRelCatEntry() of Cache Layer)
-	if (relId == E_RELNOTOPEN) {
+	if (relId<0 || relId>=MAX_OPEN) {
 		return E_RELNOTOPEN;
 	}
 

@@ -13,19 +13,17 @@ subsequent stages, we will implement the write-back functionality here.
 // declare the blockAllocMap array
 unsigned char StaticBuffer::blockAllocMap[DISK_BLOCKS];
 
-StaticBuffer::StaticBuffer() {
-	// copy blockAllocMap blocks from disk to buffer (using readblock() of disk)
-	// blocks 0 to 3
-	for (int i = 0; i < BLOCK_ALLOCATION_MAP_SIZE; i++) {
-		Disk::readBlock(blockAllocMap + i * BLOCK_SIZE, i);
+StaticBuffer::StaticBuffer(){
+	for (int blockIndex = 0, blockAllocMapSlot = 0; blockIndex < 4; blockIndex++) {
+		unsigned char buffer [BLOCK_SIZE];
+		Disk::readBlock(buffer, blockIndex);
+
+		for (int slot = 0; slot < BLOCK_SIZE; slot++, blockAllocMapSlot++)
+			StaticBuffer::blockAllocMap[blockAllocMapSlot] = buffer[slot];
 	}
 
+	// initialise all blocks as free
 	for (int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
-		// set metainfo[bufferindex] with the following values
-		//   free = true
-		//   dirty = false
-		//   timestamp = -1
-		//   blockNum = -1
 		metainfo[bufferIndex].free = true;
 		metainfo[bufferIndex].dirty = false;
 		metainfo[bufferIndex].timeStamp = -1;
@@ -35,21 +33,23 @@ StaticBuffer::StaticBuffer() {
 
 // write back all modified blocks on system exit
 StaticBuffer::~StaticBuffer() {
-	// copy blockAllocMap blocks from buffer to disk(using writeblock() of disk)
-	for (int i = 0; i < BLOCK_ALLOCATION_MAP_SIZE; i++) {
-		Disk::writeBlock(blockAllocMap + i * BLOCK_SIZE, i);
+	for (int blockIndex = 0, blockAllocMapSlot = 0; blockIndex < 4; blockIndex++) {
+		unsigned char buffer [BLOCK_SIZE];
+
+		for (int slot = 0; slot < BLOCK_SIZE; slot++, blockAllocMapSlot++) 
+			buffer[slot] = blockAllocMap[blockAllocMapSlot];
+
+		Disk::writeBlock(buffer, blockIndex);
 	}
 
-	/*iterate through all the buffer blocks,
-	  write back blocks with metainfo as free=false,dirty=true
-	  using Disk::writeBlock()
-	  */
-	for (int i = 0; i < BUFFER_CAPACITY; i++) {
-		if (!metainfo[i].free && metainfo[i].dirty) {
-			Disk::writeBlock(blocks[i], metainfo[i].blockNum);
-		}
-	}
+  	// iterate through all the buffer blocks, write back blocks 
+	// with metainfo as free=false,dirty=true using Disk::writeBlock()
 
+	for (int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
+		if (metainfo[bufferIndex].free == false 
+			&& metainfo[bufferIndex].dirty == true)
+			Disk::writeBlock(blocks[bufferIndex], metainfo[bufferIndex].blockNum);
+	}
 }
 
 int StaticBuffer::getFreeBuffer(int blockNum)
@@ -90,7 +90,7 @@ int StaticBuffer::getFreeBuffer(int blockNum)
   //     set bufferNum = index of this buffer
   if (bufferNum == BUFFER_CAPACITY)
   {
-    int m = -2, index = -1;
+    int m = -1, index = -1;
     for (int i = 0; i < BUFFER_CAPACITY; i++)
     {
       if (metainfo[i].timeStamp > m)
@@ -99,10 +99,10 @@ int StaticBuffer::getFreeBuffer(int blockNum)
         index = i;
       }
     }
+    bufferNum = index;
     if (metainfo[index].dirty == true)
     {
       Disk::writeBlock(blocks[index], metainfo[index].blockNum);
-      bufferNum = index;
     }
   }
 
@@ -138,10 +138,7 @@ int StaticBuffer::setDirtyBit(int blockNum)
   // else
   //     (the bufferNum is valid)
   //     set the dirty bit of that buffer to true in metainfo
-  else
-  {
-    metainfo[bufferNum].dirty = true;
-  }
+  metainfo[bufferNum].dirty = true;
   // return SUCCESS
   return SUCCESS;
 }
@@ -161,7 +158,7 @@ int StaticBuffer::getBufferNum(int blockNum)
   // find and return the bufferIndex which corresponds to blockNum (check metainfo)
   for (int i = 0; i < BUFFER_CAPACITY; i++)
   {
-    if (metainfo[i].blockNum == blockNum)
+    if (metainfo[i].free==false && metainfo[i].blockNum == blockNum)
     {
       return i;
     }
@@ -170,3 +167,4 @@ int StaticBuffer::getBufferNum(int blockNum)
   // if block is not in the buffer
   return E_BLOCKNOTINBUFFER;
 }
+
