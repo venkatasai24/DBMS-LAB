@@ -411,6 +411,7 @@ OpenRelTable::~OpenRelTable()
     RecBuffer relCatBlock(recId.block);
 
     // Write back to the buffer using relCatBlock.setRecord() with recId.slot
+    relCatBlock.setRecord(record, recId.slot);
   }
   // free the memory dynamically allocated for this RelCacheEntry
   free(RelCacheTable::relCache[RELCAT_RELID]);
