@@ -61,66 +61,43 @@ int Frontend::select_from_table_where(char relname_source[ATTR_SIZE], char relna
   return Algebra::select(relname_source, relname_target, attribute, op, value);
 }
 
-int Frontend::select_attrlist_from_table_where(char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
-                                               int attr_count, char attr_list[][ATTR_SIZE],
-                                               char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE]) {
-    char temp[ATTR_SIZE];
-    strcpy(temp,TEMP);
-    int ret = Algebra::select(relname_source, temp, attribute, op, value); 
-    if (ret != SUCCESS) return ret;
-    
-    ret = OpenRelTable::openRel(temp);
-    if (ret < 0 || ret >= MAX_OPEN) return ret;
-    
-    ret = Algebra::project (temp, relname_target, attr_count, attr_list); 
-    if (ret != SUCCESS) return ret;
-    
+int Frontend::select_attrlist_from_table_where(
+    char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
+    int attr_count, char attr_list[][ATTR_SIZE],
+    char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE]) {
+  char temp[ATTR_SIZE];
+	strcpy(temp, TEMP);
+	int ret = Algebra::select(relname_source, temp, attribute, op, value);
+
+	// TEMP will contain all the attributes of the source relation as it is the
+	// result of a select operation
+
+	// Return Error values, if not successful
+	if (ret != SUCCESS) {
+		return ret;
+	}
+
+	// Open the TEMP relation using OpenRelTable::openRel()
+	// if open fails, delete TEMP relation using Schema::deleteRel() and
+	// return the error code
+	ret = OpenRelTable::openRel(temp);
+	if (ret < 0) {
+		return ret;
+	}
+
+	// On the TEMP relation, call project() method of the Algebra Layer with
+	// correct arguments to create the actual target relation. The final
+	// target relation contains only those attributes mentioned in attr_list
+	Algebra::project(temp, relname_target, attr_count, attr_list);
+
+	// close the TEMP relation using OpenRelTable::closeRel()
+	// delete the TEMP relation using Schema::deleteRel()
 	Schema::closeRel(temp);
-    Schema::deleteRel(temp);
-  
-    return SUCCESS;
+	Schema::deleteRel(temp);
+
+	// return any error codes from project() or SUCCESS otherwise
+	return SUCCESS;
 }
-
-// int Frontend::select_attrlist_from_table_where(
-//     char relname_source[ATTR_SIZE], char relname_target[ATTR_SIZE],
-//     int attr_count, char attr_list[][ATTR_SIZE],
-//     char attribute[ATTR_SIZE], int op, char value[ATTR_SIZE]) {
-
-
-//     char temp[ATTR_SIZE];
-//     strcpy(temp,TEMP);
-//     // Call select() method of the Algebra Layer with correct arguments to
-//     // create a temporary target relation with name ".temp" (use constant TEMP)
-//     int ret = Algebra::select(relname_source,temp,attribute,op,value);
-
-//     // TEMP will contain all the attributes of the source relation as it is the
-//     // result of a select operation
-//     // Return Error values, if not successful
-//     if(ret!=SUCCESS)
-//     {
-//       return ret;
-//     }
-
-//     // Open the TEMP relation using OpenRelTable::openRel()
-//     // if open fails, delete TEMP relation using Schema::deleteRel() and
-//     // return the error code
-//     ret = OpenRelTable::openRel(temp);
-//     if(ret<0 || ret>=E_MAXRELATIONS)
-//     {
-//       Schema::deleteRel(temp);
-//       return ret;
-//     }
-//     // On the TEMP relation, call project() method of the Algebra Layer with
-//     // correct arguments to create the actual target relation. The final
-//     // target relation contains only those attributes mentioned in attr_list
-//     int val = Algebra::project(temp,relname_target,attr_count,attr_list);
-//     // close the TEMP relation using OpenRelTable::closeRel()
-//     // delete the TEMP relation using Schema::deleteRel()
-//     OpenRelTable::closeRel(ret);
-//     Schema::deleteRel(temp);
-//     // return any error codes from project() or SUCCESS otherwise
-//     return val;
-// }
 
 int Frontend::select_from_join_where(char relname_source_one[ATTR_SIZE], char relname_source_two[ATTR_SIZE],
                                      char relname_target[ATTR_SIZE],
