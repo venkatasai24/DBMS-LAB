@@ -601,7 +601,7 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
                 RecBuffer rightBlock(header.rblock);
                 HeadInfo rightHeader;
                 rightBlock.getHeader(&rightHeader);
-                rightHeader.lblock=header.lblock;
+                rightHeader.lblock=head.lblock;
                 rightBlock.setHeader(&rightHeader);
 
             } else {
