@@ -54,7 +54,7 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
     if (type == NUMBER) {
         // if the input argument strVal can be converted to a number
         // (check this using isNumber() function)
-        if (isNumber(strVal)) {
+        if(isNumber(strVal)) {
             // convert strVal to double and store it at attrVal.nVal using atof()
             attrVal.nVal = atof(strVal);
         }
@@ -74,8 +74,9 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
     RelCatEntry relCatEntry;
     RelCacheTable::getRelCatEntry(srcRelId, &relCatEntry);
 
-    /* the no. of attributes present in src relation */
+    /* the no. of attributes present in src relation */ 
     int src_nAttrs = relCatEntry.numAttrs;
+
 
     /* let attr_names[src_nAttrs][ATTR_SIZE] be a 2D array of type char
         (will store the attribute names of rel). */
@@ -130,12 +131,11 @@ int Algebra::select(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], char attr
         first record.
     */
     RelCacheTable::resetSearchIndex(srcRelId);
-    //-- AttrCacheTable::resetSearchIndex(/* fill arguments */); --//
+    AttrCacheTable::resetSearchIndex(srcRelId,attr);
 
     // read every record that satisfies the condition by repeatedly calling
     // BlockAccess::search() until there are no more records to be read
 
-    /* BlockAccess::search() returns success */
     while (BlockAccess::search(srcRelId, record, attr, attrVal, op) == SUCCESS) {
 
         // ret = BlockAccess::insert(targetRelId, record);
