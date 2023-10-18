@@ -1,11 +1,13 @@
 #include "BlockAccess.h"
-
+#include<iostream>
 #include <cstring>
 #include<stdlib.h>
+using namespace std;
 
 RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attribute attrVal, int op) {
     // get the previous search index of the relation relId from the relation cache
     // (use RelCacheTable::getSearchIndex() function)
+    int cnt=0;
     RecId prevRecId;
     RelCacheTable::getSearchIndex(relId,&prevRecId);
 
@@ -97,6 +99,7 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
         int cmpVal;  // will store the difference between the attributes
         // set cmpVal using compareAttrs()
         cmpVal = compareAttrs(val,attrVal,entry.attrType);
+        cnt++;
 
         /* Next task is to check whether this record satisfies the given condition.
            It is determined based on the output of previous comparison and
@@ -118,7 +121,7 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
             */
            prevRecId = RecId{block, slot};
            RelCacheTable::setSearchIndex(relId,&prevRecId);
-
+           cout<<"value in the block "<<val.nVal<<" found for this op "<<op<<" for attr val "<<attrVal.nVal<<" "<<cnt<<endl;
             return prevRecId;
         }
 
@@ -126,6 +129,7 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
     }
 
     // no record in the relation with Id relid satisfies the given condition
+    cout<<"not found "<<cnt<<endl;
     return RecId{-1, -1};
 }
 
