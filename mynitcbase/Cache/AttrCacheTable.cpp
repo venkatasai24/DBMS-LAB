@@ -262,7 +262,7 @@ int AttrCacheTable::setAttrCatEntry(int relId,int attrOffset, AttrCatEntry *attr
   return E_ATTRNOTEXIST;
 }
 
-void attrCatEntryToRecord(AttrCatEntry *attrCatEntry, union Attribute record[ATTRCAT_NO_ATTRS])
+void AttrCacheTable::attrCatEntryToRecord(AttrCatEntry *attrCatEntry, union Attribute record[ATTRCAT_NO_ATTRS])
 {
   strcpy(record[ATTRCAT_REL_NAME_INDEX].sVal,attrCatEntry->relName);
 

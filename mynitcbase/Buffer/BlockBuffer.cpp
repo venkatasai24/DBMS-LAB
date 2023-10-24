@@ -336,6 +336,12 @@ BlockBuffer::BlockBuffer(char blockType){
 	if (blockType == 'R') {
 		ret = getFreeBlock(REC);
 	}
+  else if (blockType == 'L') {
+		ret = getFreeBlock(IND_LEAF);
+	}
+	else if (blockType == 'I') {
+		ret = getFreeBlock(IND_INTERNAL);
+	}
 	
     // set the blockNum field of the object to that of the allocated block
     // number if the method returned a valid block number,
