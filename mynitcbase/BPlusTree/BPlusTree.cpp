@@ -122,7 +122,7 @@ RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attr
                 int cmpVal = compareAttrs(intEntry.attrVal, attrVal, attrCatEntry.attrType);
 
                 if (
-                    (op == EQ && cmpVal == 0) ||
+                    (op == EQ && cmpVal >= 0) ||
                     (op == GE && cmpVal >= 0) ||
                     (op == GT && cmpVal > 0)
                 ) {
