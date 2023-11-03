@@ -10,14 +10,14 @@ INSERT INTO Locations VALUES FROM locations.csv;
 OPEN TABLE Participants;
 INSERT INTO Participants VALUES FROM participants.csv;
 echo --------------------------------------------
-SELECT location from Events into temp1 where location=Audi;
-open table temp1;
 echo ----JOINING----
-SELECT name FROM Locations JOIN temp1 INTO EventLocations WHERE Locations.name = temp1.location;
+SELECT name FROM Locations JOIN Events INTO EventLocations WHERE Locations.name = Events.location;
 echo ----DROPPING TEMPORARY RELATIONS----
+SELECT * from Events into temp1 where location=Audi;
+open table temp1;
+SELECT regNo, event FROM Participants JOIN temp1 INTO AudiPeople WHERE Participants.event = temp1.title;
 CLOSE TABLE temp1;
 DROP TABLE temp1;
-SELECT regNo, event FROM Participants JOIN Events INTO AudiPeople WHERE Participants.event = Events.title;
 SELECT regNo, event, location FROM Participants JOIN Events INTO temp3 WHERE Participants.event = Events.title;
 OPEN TABLE temp3;
 SELECT regNo, event, capacity FROM  Locations JOIN temp3 INTO temp1 WHERE Locations.name = temp3.location;
